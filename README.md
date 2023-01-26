@@ -11,7 +11,7 @@ alt="Shows a small dialog, with the human asking who Alexander the Great is, and
 alt="Shows lines with search results, the titles and the urls.">
 
 
-- Uses `html2text` to strip the markup out of the page.
+- Uses `trafilatura` to parse the page content since this tool can do heavy filter to keep only the main text.
 - Uses `beautifulsoup4` to parse the title.
 - Currently only uses the `googlesearch` module to query Google for urls, but is coded
 in a modular / search engine agnostic way to allow very easily add new search engine support.
