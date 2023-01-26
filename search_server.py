@@ -12,7 +12,8 @@ import urllib.parse
 import bs4
 import chardet
 import fire
-import html2text
+import trafilatura
+from trafilatura.settings import use_config
 import googlesearch
 import parlai.agents.rag.retrieve_api
 import rich
@@ -71,13 +72,20 @@ def _get_and_parse(url: str) -> Dict[str, str]:
     ###########################################################################
     # Prepare the content
     ###########################################################################
-    text_maker = html2text.HTML2Text()
-    text_maker.ignore_links = True
-    text_maker.ignore_tables = True
-    text_maker.ignore_images = True
-    text_maker.ignore_emphasis = True
-    text_maker.single_line = True
-    output_dict["content"] = html.unescape(text_maker.handle(page).strip())
+    # text_maker = html2text.HTML2Text()
+    # text_maker.ignore_links = True
+    # text_maker.ignore_tables = True
+    # text_maker.ignore_images = True
+    # text_maker.ignore_emphasis = True
+    # text_maker.single_line = True
+    # output_dict["content"] = html.unescape(text_maker.handle(page).strip())
+    downloaded = trafilatura.fetch_url(url)
+    if downloaded:
+        newconfig = use_config()
+        newconfig.set("DEFAULT", "EXTRACTION_TIMEOUT", "0")
+        output_dict["content"] = trafilatura.extract(downloaded, config=newconfig)
+    else:
+        output_dict = None
 
     return output_dict
 
@@ -121,6 +129,9 @@ class SearchABC(http.server.BaseHTTPRequestHandler):
         
         # Search until we have n valid entries
         for url in self.search(q=q, n=n):
+            if 'youtube.com' in url: # we do not want video content
+                continue
+
             if len(content) >= n:
                 break
 

@@ -2,7 +2,7 @@ bs4
 chardet
 fairseq
 fire
-html2text
+trafilatura
 html5lib
 google
 html5lib
